@@ -1,0 +1,154 @@
+#include <Adafruit_NeoPixel.h>
+
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+  #include <avr/power.h>
+#endif
+
+#define PIN 6
+#define BRIGHTNESS 60
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(40, PIN, NEO_GRB + NEO_KHZ800);
+
+byte neopix_gamma[] = {
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,
+    2,  3,  3,  3,  3,  3,  3,  3,  4,  4,  4,  4,  4,  5,  5,  5,
+    5,  6,  6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  9,  9,  9, 10,
+   10, 10, 11, 11, 11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16,
+   17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25,
+   25, 26, 27, 27, 28, 29, 29, 30, 31, 32, 32, 33, 34, 35, 35, 36,
+   37, 38, 39, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 50,
+   51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68,
+   69, 70, 72, 73, 74, 75, 77, 78, 79, 81, 82, 83, 85, 86, 87, 89,
+   90, 92, 93, 95, 96, 98, 99,101,102,104,105,107,109,110,112,114,
+  115,117,119,120,122,124,126,127,129,131,133,135,137,138,140,142,
+  144,146,148,150,152,154,156,158,160,162,164,167,169,171,173,175,
+  177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
+  215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255 };
+  
+void setup() {
+  // This is for Trinket 5V 16MHz, you can remove these three lines if you are not using a Trinket
+  #if defined (__AVR_ATtiny85__)
+    if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
+  #endif
+  // End of trinket special code
+
+  strip.setBrightness(BRIGHTNESS);
+  strip.begin();
+  strip.show(); // Initialize all pixels to 'off'
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  //meteorRain(0,100,100,10, 64, true, 30);
+  //meteorRain(255,0,0,10, 64, true, 30);
+  //meteorRain(255,0,0,0, 64, true, 30);
+ // red_orange(50);
+  //red_orange(50);
+  //red_orange(50);
+  FadeInOut(0,0,0,255,90,0);
+  //FadeInOut(0,100,100,255,90,0);
+  //FadeInOut(0,100,100,255,90,0);
+}
+
+void setColors(int r1, int g1, int b1, int r2, int g2, int b2){
+  for(int i=0;i < strip.numPixels(); i++){
+      strip.setPixelColor(i,r1,g1,b1);
+      strip.setPixelColor(59-i,r2,g2,b2);
+    }
+    strip.show();
+    delay(10
+    );
+}
+
+void setAll(int r1, int g1, int b1){
+  for(int i=0;i < strip.numPixels(); i++){
+      strip.setPixelColor(i,r1,g1,b1);
+    }
+    strip.show();
+}
+void FadeInOut(int red, int green, int blue, int red2, int green2, int blue2){
+  float r1,r2,g1,g2,b1,b2;
+
+  for(int i = 255; i >= 0;i=i-2){
+    r1 = (i/256.0)*red;
+    g1 = (i/256.0)*green;
+    b1 = (i/256.0)*blue;
+
+    r2 = (i/256.0)*red2;
+    g2 = (i/256.0)*green2;
+    b2 = (i/256.0)*blue2;
+    setColors(r1,g1,b1,r2,g2,b2);
+  }
+  for(int i = 0; i < 256;i++){
+    r1 = (i/256.0)*red;
+    g1 = (i/256.0)*green;
+    b1 = (i/256.0)*blue;
+
+    r2 = (i/256.0)*red2;
+    g2 = (i/256.0)*green2;
+    b2 = (i/256.0)*blue2;
+    setColors(r1,g1,b1,r2,g2,b2);
+  }
+}
+
+void red_orange(uint8_t wait){
+  uint32_t red,orange;
+  uint16_t maxPixel;
+  red = strip.Color(200,100,0);
+  orange = strip.Color(200,100,0);
+  maxPixel = strip.numPixels();
+  for (uint16_t i=0; i < strip.numPixels(); i++){
+    strip.setPixelColor(i,red);
+    strip.setPixelColor(59-i,orange); 
+    strip.show();
+    delay(wait);
+  }
+}
+
+void meteorRain(int red, int green, int blue, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay) {  
+  setAll(0,0,0);
+  int NUM_LEDS = strip.numPixels();
+  for(int i = 0; i < NUM_LEDS+NUM_LEDS; i++) {
+    
+    
+//     fade brightness all LEDs one step
+    for(int j=0; j<NUM_LEDS; j++) {
+      if( (!meteorRandomDecay) || (random(10)>5) ) {
+        fadeToBlack(j, meteorTrailDecay );        
+      }
+    }
+    
+    // draw meteor
+    for(int j = 0; j < meteorSize; j++) {
+      if( ( i-j <NUM_LEDS) && (i-j>=0) ) {
+        strip.setPixelColor(i-j, red, green, blue);
+      } 
+    }
+   
+    strip.show();
+    delay(SpeedDelay);
+  }
+}
+
+void fadeToBlack(int ledNo, byte fadeValue) {
+ #ifdef ADAFRUIT_NEOPIXEL_H 
+    // NeoPixel
+    uint32_t oldColor;
+    uint8_t r, g, b;
+    int value;
+    
+    oldColor = strip.getPixelColor(ledNo);
+    r = (oldColor & 0x00ff0000UL) >> 16;
+    g = (oldColor & 0x0000ff00UL) >> 8;
+    b = (oldColor & 0x000000ffUL);
+
+    r=(r<=10)? 0 : (int) r-(r*fadeValue/256);
+    g=(g<=10)? 0 : (int) g-(g*fadeValue/256);
+    b=(b<=10)? 0 : (int) b-(b*fadeValue/256);
+    
+    strip.setPixelColor(ledNo, r,g,b);
+ #endif
+}
